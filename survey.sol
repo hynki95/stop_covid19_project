@@ -27,11 +27,11 @@ contract SurveyContract{
     }
     
     struct Infos{
-        string Info;
+        string info;
     }
     
     struct Answers{
-        string Answer;
+        string answer;
     }
     
     struct Questionsheet{
@@ -62,7 +62,19 @@ contract SurveyContract{
     }
     
     function addAnswer(string memory _answer) public{
-        
+        uint _TotalAnswersheet = surveyindex[TotalSurvey].TotalAnswersheet;
+        Answersheet storage _Answersheet = surveyindex[TotalSurvey].AnswersheetIndex[_TotalAnswersheet];
+        uint _TotalAnswer = _Answersheet.TotalAnswer;
+        _Answersheet.AnswerIndex[_TotalAnswer].answer = _answer;
+        _TotalAnswer.add(1);
+    }
+    
+     function addInfo(string memory _info) public{
+        uint _TotalAnswersheet = surveyindex[TotalSurvey].TotalAnswersheet;
+        Answersheet storage _Answersheet = surveyindex[TotalSurvey].AnswersheetIndex[_TotalAnswersheet];
+        uint _TotalInfo = _Answersheet.TotalInfo;
+        _Answersheet.InfoIndex[_TotalInfo].info = _info;
+        _TotalInfo.add(1);
     }
     
     ///////////////////////view///////////////////////////////////////////////
