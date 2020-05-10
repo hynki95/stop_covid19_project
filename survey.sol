@@ -25,6 +25,7 @@ contract SurveyContract{
     }
     
     struct Answers{
+        address addresscheck;
         string answer;
     }
     
@@ -66,31 +67,34 @@ contract SurveyContract{
         surveyindex[TotalSurvey].surveying == false;
     }
     
-    function addQuestion(string memory _question) public{
+    function addQuestion(uint surveyID, string memory _question) public{
         Surveysheet storage _Surveysheet = surveyindex[TotalSurvey];
         require(_Surveysheet.surveying == true);
         require(_Surveysheet.Surveyer == msg.sender);
-        uint _TotalQuestionsheet = surveyindex[TotalSurvey].TotalQuestionsheet;
+        uint _TotalQuestionsheet = surveyindex[surveyID].TotalQuestionsheet;
         Questionsheet storage _Questionsheet = surveyindex[TotalSurvey].QuestionsheetIndex[_TotalQuestionsheet];
         uint _TotalQuestion = _Questionsheet.TotalQuestion;
         _Questionsheet.QuestionIndex[_TotalQuestion].question = _question;
-        surveyindex[TotalSurvey].QuestionsheetIndex[_TotalQuestionsheet].TotalQuestion++;
-        surveyindex[TotalSurvey].TotalQuestionsheet++;
+        surveyindex[surveyID].QuestionsheetIndex[_TotalQuestionsheet].TotalQuestion++;
+        surveyindex[surveyID].TotalQuestionsheet++;
     }
     
-    function addAnswer(string memory _answer) public{
-        uint _TotalQuestionsheet = surveyindex[TotalSurvey].TotalQuestionsheet;
-        uint _TotalQuestion=surveyindex[TotalSurvey].QuestionsheetIndex[_TotalQuestionsheet].TotalQuestion;
-        Surveysheet storage _Surveysheet = surveyindex[TotalSurvey];
-        require(_Surveysheet.surveying == true);
-        uint _TotalAnswersheet = surveyindex[TotalSurvey].TotalAnswersheet;
-        require(_TotalQuestionsheet != 0 && _TotalQuestionsheet > _TotalAnswersheet);
-        Answersheet storage _Answersheet = surveyindex[TotalSurvey].AnswersheetIndex[_TotalAnswersheet];
+    function addAnswer(uint surveyID, string memory _answer) public{
+        uint _TotalQuestionsheet = surveyindex[surveyID].TotalQuestionsheet;
+        uint _TotalQuestion=surveyindex[surveyID].QuestionsheetIndex[_TotalQuestionsheet].TotalQuestion;
+        Surveysheet storage _Surveysheet = surveyindex[surveyID];
+        require(_Surveysheet.surveying == true); // check if surveying is true
+        uint _TotalAnswersheet = surveyindex[surveyID].TotalAnswersheet;
+        require(_TotalQuestionsheet != 0 && _TotalQuestionsheet > _TotalAnswersheet); //check if Question sheet is available
+        Answersheet storage _Answersheet = surveyindex[surveyID].AnswersheetIndex[_TotalAnswersheet];
         uint _TotalAnswer = _Answersheet.TotalAnswer;
+        require(surveyindex[surveyID].AnswersheetIndex[_TotalAnswersheet].AnswerIndex[_TotalAnswer].addresscheck != msg.sender);// block same answerer
         _Answersheet.AnswerIndex[_TotalAnswer].answer = _answer;
-        surveyindex[TotalSurvey].AnswersheetIndex[_TotalAnswersheet].TotalAnswer++;
-        if(surveyindex[TotalSurvey].AnswersheetIndex[_TotalAnswersheet].TotalAnswer>= surveyindex[TotalSurvey].goal){
-        surveyindex[TotalSurvey].TotalAnswersheet++;
+        surveyindex[surveyID].AnswersheetIndex[_TotalAnswersheet].answerer = msg.sender;
+        surveyindex[surveyID].AnswersheetIndex[_TotalAnswersheet].TotalAnswer++;
+        surveyindex[surveyID].AnswersheetIndex[_TotalAnswersheet].AnswerIndex[_TotalAnswer].addresscheck = msg.sender;
+        if(surveyindex[surveyID].AnswersheetIndex[_TotalAnswersheet].TotalAnswer>= surveyindex[TotalSurvey].goal){
+        surveyindex[surveyID].TotalAnswersheet++;
         }
     }
     
