@@ -25,7 +25,6 @@ contract SurveyContract{
     }
     
     struct Answers{
-        address addresscheck;
         string answer;
     }
     
@@ -43,8 +42,8 @@ contract SurveyContract{
     struct Info{
         uint age;
         string sex;
-        int heigth;
-        int weigth;
+        string heigth;
+        string weigth;
         string country;
     }
     
@@ -57,44 +56,43 @@ contract SurveyContract{
         _Surveysheet.purpose = _purpose;
         _Surveysheet.SNS = _SNS;
         _Surveysheet.goal = _goal;
-    }
-    
-    function endSurvey() public{
-        Surveysheet storage _Surveysheet = surveyindex[TotalSurvey];
-        require(_Surveysheet.Surveyer == msg.sender);
         TotalSurvey++;
-        surveyindex[TotalSurvey].surveying == false;
     }
     
+    function endSurvey(uint surveyID) public{
+        require(surveyindex[surveyID].Surveyer == msg.sender);
+        TotalSurvey++;
+        surveyindex[surveyID].surveying == false;
+    }
+    event addQuestionList(uint indexed surveyID, string _question);
     function addQuestion(uint surveyID, string memory _question) public{
-        Surveysheet storage _Surveysheet = surveyindex[TotalSurvey];
+        Surveysheet storage _Surveysheet = surveyindex[surveyID];
         require(_Surveysheet.surveying == true);
         require(_Surveysheet.Surveyer == msg.sender);
         uint _TotalQuestionsheet = surveyindex[surveyID].TotalQuestionsheet;
-        Questionsheet storage _Questionsheet = surveyindex[TotalSurvey].QuestionsheetIndex[_TotalQuestionsheet];
+        Questionsheet storage _Questionsheet = surveyindex[surveyID].QuestionsheetIndex[_TotalQuestionsheet];
         uint _TotalQuestion = _Questionsheet.TotalQuestion;
         _Questionsheet.QuestionIndex[_TotalQuestion].question = _question;
         surveyindex[surveyID].QuestionsheetIndex[_TotalQuestionsheet].TotalQuestion++;
         surveyindex[surveyID].TotalQuestionsheet++;
+        emit addQuestionList( surveyID,  _question);
     }
-    
-    function addAnswer(uint surveyID, string memory _answer) public{
+    event addAnswerList(uint indexed surveyID, uint indexed _answersheetID, string _answer);
+    function addAnswer(uint surveyID, uint _questionsheetID, string memory _answer) public{
         uint _TotalQuestionsheet = surveyindex[surveyID].TotalQuestionsheet;
-        uint _TotalQuestion=surveyindex[surveyID].QuestionsheetIndex[_TotalQuestionsheet].TotalQuestion;
         Surveysheet storage _Surveysheet = surveyindex[surveyID];
         require(_Surveysheet.surveying == true); // check if surveying is true
         uint _TotalAnswersheet = surveyindex[surveyID].TotalAnswersheet;
         require(_TotalQuestionsheet != 0 && _TotalQuestionsheet > _TotalAnswersheet); //check if Question sheet is available
         Answersheet storage _Answersheet = surveyindex[surveyID].AnswersheetIndex[_TotalAnswersheet];
         uint _TotalAnswer = _Answersheet.TotalAnswer;
-        require(surveyindex[surveyID].AnswersheetIndex[_TotalAnswersheet].AnswerIndex[_TotalAnswer].addresscheck != msg.sender);// block same answerer
         _Answersheet.AnswerIndex[_TotalAnswer].answer = _answer;
-        surveyindex[surveyID].AnswersheetIndex[_TotalAnswersheet].answerer = msg.sender;
-        surveyindex[surveyID].AnswersheetIndex[_TotalAnswersheet].TotalAnswer++;
-        surveyindex[surveyID].AnswersheetIndex[_TotalAnswersheet].AnswerIndex[_TotalAnswer].addresscheck = msg.sender;
-        if(surveyindex[surveyID].AnswersheetIndex[_TotalAnswersheet].TotalAnswer>= surveyindex[TotalSurvey].goal){
+        surveyindex[surveyID].AnswersheetIndex[_questionsheetID].answerer = msg.sender;
+        if(surveyindex[surveyID].AnswersheetIndex[_questionsheetID].TotalAnswer>= surveyindex[TotalSurvey].goal){
         surveyindex[surveyID].TotalAnswersheet++;
         }
+        surveyindex[surveyID].AnswersheetIndex[_questionsheetID].TotalAnswer++;
+        emit addAnswerList(surveyID,_questionsheetID,_answer);
     }
     
      function Register(uint _age, string memory _sex, string memory _heigth, string memory _weigth, string memory _country) public{
