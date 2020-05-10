@@ -52,7 +52,6 @@ contract SurveyContract{
     
     function makeSurvey(string memory _purpose, string memory _SNS, uint _goal) public{
         Surveysheet storage _Surveysheet = surveyindex[TotalSurvey];
-        require(_Surveysheet.surveying == false);
         _Surveysheet.Surveyer=msg.sender;
         _Surveysheet.surveying = true;
         _Surveysheet.purpose = _purpose;
