@@ -54,27 +54,40 @@ contract SurveyContract{
     
     function endSurvey() public{
         Surveysheet storage _Surveysheet = surveyindex[TotalSurvey];
+        require(_Surveysheet.Surveyer == msg.sender);
         TotalSurvey++;
         _Surveysheet.surveying == false;
     }
     
     function addQuestion(string memory _question) public{
+        Surveysheet storage _Surveysheet = surveyindex[TotalSurvey];
+        require(_Surveysheet.surveying == true);
+        require(_Surveysheet.Surveyer == msg.sender);
         uint _TotalQuestionsheet = surveyindex[TotalSurvey].TotalQuestionsheet;
         Questionsheet storage _Questionsheet = surveyindex[TotalSurvey].QuestionsheetIndex[_TotalQuestionsheet];
         uint _TotalQuestion = _Questionsheet.TotalQuestion;
         _Questionsheet.QuestionIndex[_TotalQuestion].question = _question;
-        _TotalQuestion++;
+        surveyindex[TotalSurvey].QuestionsheetIndex[_TotalQuestionsheet].TotalQuestion++;
+        surveyindex[TotalSurvey].TotalQuestionsheet++;
     }
     
     function addAnswer(string memory _answer) public{
+        uint _TotalQuestionsheet = surveyindex[TotalSurvey].TotalQuestionsheet;
+        uint _TotalQuestion=surveyindex[TotalSurvey].QuestionsheetIndex[_TotalQuestionsheet].TotalQuestion;
+        Surveysheet storage _Surveysheet = surveyindex[TotalSurvey];
+        require(_Surveysheet.surveying == true);
         uint _TotalAnswersheet = surveyindex[TotalSurvey].TotalAnswersheet;
+        require(_TotalQuestionsheet != 0 && _TotalQuestionsheet >= _TotalAnswersheet);
         Answersheet storage _Answersheet = surveyindex[TotalSurvey].AnswersheetIndex[_TotalAnswersheet];
         uint _TotalAnswer = _Answersheet.TotalAnswer;
         _Answersheet.AnswerIndex[_TotalAnswer].answer = _answer;
-        _TotalAnswer++;
+        surveyindex[TotalSurvey].AnswersheetIndex[_TotalAnswersheet].TotalAnswer++;
+        surveyindex[TotalSurvey].TotalAnswersheet++;
     }
     
      function addInfo(string memory _info) public{
+        Surveysheet storage _Surveysheet = surveyindex[TotalSurvey];
+        require(_Surveysheet.surveying == true);
         uint _TotalAnswersheet = surveyindex[TotalSurvey].TotalAnswersheet;
         Answersheet storage _Answersheet = surveyindex[TotalSurvey].AnswersheetIndex[_TotalAnswersheet];
         uint _TotalInfo = _Answersheet.TotalInfo;
@@ -84,6 +97,20 @@ contract SurveyContract{
     
     ///////////////////////view///////////////////////////////////////////////
     
-   
-
+    function getQuestions(uint _surveyID, uint _quesionsheetID, uint _questionID) public view returns(string memory _question, uint _TotalQuestion){
+        Questionsheet storage _Questionsheet = surveyindex[_surveyID].QuestionsheetIndex[_quesionsheetID];
+        _TotalQuestion = _Questionsheet.TotalQuestion;
+        _question = _Questionsheet.QuestionIndex[_questionID].question;
+    }
+    
+   function getAnswers(uint _surveyID, uint _answersheetID, uint _answerID) public view returns(string memory _answer, uint _TotalAnswer){
+        Answersheet storage _Answersheet = surveyindex[_surveyID].AnswersheetIndex[_answersheetID];
+        _TotalAnswer = _Answersheet.TotalAnswer;
+        _answer = _Answersheet.AnswerIndex[_answerID].answer;
+    }
+    
+    function getInfo(uint _surveyID, uint _answersheetID, uint _infoID) public view returns(string memory _info){
+        Answersheet storage _Answersheet = surveyindex[_surveyID].AnswersheetIndex[_answersheetID];
+        _info = _Answersheet.InfoIndex[_infoID].info;
+    }
 }
