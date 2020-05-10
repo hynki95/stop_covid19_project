@@ -43,8 +43,8 @@ contract SurveyContract{
     struct Info{
         uint age;
         string sex;
-        string heigth;
-        string weigth;
+        int heigth;
+        int weigth;
         string country;
     }
     
