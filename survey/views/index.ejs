@@ -596,8 +596,8 @@
         success: async function(r){
           if(r.status == true){
             alert(r.msg)
-            $("#searchQuestion_totalQuestion").val(r.data0);
-            $("#searchQuestion_question").val(r.data1);
+            $("#searchQuestion_totalQuestion").val(r.data1);
+            $("#searchQuestion_question").val(r.data0);
           }else{
             alert("error")
           }
