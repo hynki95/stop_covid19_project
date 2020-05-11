@@ -63,7 +63,7 @@
           }
 
           input {
-            height: 40px;
+            height: 35px;
             padding: 0 0 0 0;
           }
         </style>
@@ -93,8 +93,9 @@
           <li class="active"><a href="./#3"><span class="span class= fas fa-check"></span> For Survey respondent</a></li>     
           <li class="active"><a href="./#4"><span class="span class= fas fa-check"></span> For Result</a></li>     
           <li style="padding-left: 20px;">privateKey <input type="text" id="privateKey" class="inputbox inner" placeholder="put your privatekey here" > </li>    
-          <li style="padding-left: 20px;">publicKey  <input type="text" id="publicKey"  class="inputbox inner" readonly></li>    
-          <!-- <li style="padding-left: 20px;"><button id="login" class="loginbutton" style="text-align: center;"> <span class="fas fa-sign-in-alt"></span>  Log IN</button></li> -->
+          <li style="padding-left: 20px;">publicKey  <input type="text" id="publicKey"  class="inputbox inner" readonly></li>
+          <li style="padding-left: 20px;"><button id="gettotalsurvey" class="loginbutton" style="text-align: center;"> </span>survey total</button></li>
+          <li style="padding-left: 20px;"><button id="getcsv" class="loginbutton" style="text-align: center;"> </span>getcsv</button></li>
         </ul>
         
         <br>
@@ -165,7 +166,7 @@
         <div class="form-header">
         <h1>Survey Index</h1>
         </div>
-              <a class="btn"  role="button" id="makesurvey">　　　click! to check survey Info　　　</a>
+              <a class="btn"  role="button" id="getsurveyindex">　　　click! to check survey Info　　　</a>
               <div class="form-group">
               </div>
           <!-- </div> -->
@@ -176,32 +177,37 @@
 
           <div class="form-group">
             <label >surveying (if true you can servey now)</label>
-            <input type="text" id="Index_surveying"  required="required"/>
+            <input type="text" id="Index_surveying"  required="required" readonly/>
           </div>
 
           <div class="form-group">
             <label >survey maker address</label>
-            <input type="text" id="Index_surveyer"   required="required"/>
+            <input type="text" id="Index_surveyer"   required="required" readonly/>
+          </div>
+
+          <div class="form-group">
+            <label >Purpose</label>
+            <input type="text" id="Index_Purpose" required="required" readonly/>
           </div>
           
           <div class="form-group">
               <label >SNS</label>
-              <input type="text" id="Index_SNS"  required="required"/>
+              <input type="text" id="Index_SNS"  required="required" readonly/>
           </div>
 
           <div class="form-group">
             <label >goal</label>
-            <input type="text" id="Index_goal"  required="required"/>
+            <input type="text" id="Index_goal"  required="required" readonly/>
         </div>
 
         <div class="form-group">
           <label >TotalQuestionsheet </label>
-          <input type="text" id="Index_TotalQuestionsheet"  required="required"/>
+          <input type="text" id="Index_TotalQuestionsheet"  required="required" readonly/>
         </div>
 
         <div class="form-group">
           <label >TotalQuestionsheet </label>
-          <input type="text" id="Index_TotalAnswersheet"  required="required"/>
+          <input type="text" id="Index_TotalAnswersheet"  required="required" readonly/>
         </div>
       </div>
       <div class="col-md-6">
@@ -267,7 +273,7 @@
           <div class="form-header">
           <h1>Search Question</h1>
           </div>
-          <a class="btn"  role="button" id="register">　　　click! to view Question　　　</a>
+          <a class="btn"  role="button" id="searchQuestion">　　　click! to view Question　　　</a>
           <div class="form-group">
           </div>
               <!-- </div> -->
@@ -301,7 +307,7 @@
         <div class="form-header" style="margin-top: 10px;">
         <h1>add Answer</h1>
         </div>
-        <a class="btn"  role="button" id="register">　　　click! to Answer　　　</a>
+        <a class="btn"  role="button" id="addanswer">　　　click! to Answer　　　</a>
         <div class="form-group">
           <label >surveyID</label>
           <input type="text" id="addAnswer_surveyID" placeholder="put surveyID"  required="required"/>
@@ -325,7 +331,7 @@
           <div class="form-header">
           <h1>Search Answer</h1>
           </div>
-          <a class="btn"  role="button" id="register">　　　click! to view Answer　　　</a>
+          <a class="btn"  role="button" id="searchAnswer">　　　click! to view Answer　　　</a>
           <div class="form-group">
           </div>
               <!-- </div> -->
@@ -363,7 +369,7 @@
         <div class="form-header">
         <h1>Info index</h1>
         </div>
-        <a class="btn"  role="button" id="register">　　　click! to check Personal Information　　　</a>
+        <a class="btn"  role="button" id="infoindex">　　　click! to check Personal Information　　　</a>
         <div class="form-group" style="margin-top: 10px;">
           <label >Address to Search</label>
           <input type="text" id="searchInfo_address" placeholder="put address and get Information"  required="required"/>
@@ -436,6 +442,7 @@
         }
       })
     })
+    ////////////////////////transaction/////////////////
     $("#register").on("click",function(){
       $.ajax({
         type: "POST",
@@ -531,25 +538,123 @@
         }
       })
     })
-    $("#addanswer").on("click",function(){
+    /////////////////////////view/////////////////
+    $("#getsurveyindex").on("click",function(){
       $.ajax({
         type: "POST",
-        url : '/addanswer',
+        url : '/getsurveyindex',
         data : {
-          'privateKey' : $("#privateKey").val(),
-          'surveyID' : $("#addAnswer_surveyID").val(),
-          'answer' : $("#addAnswer_answer").val(),
-          'addAnswer_questionsheetID' : $("#addAnswer_questionsheetID").val(),
+          'surveyID' : $("#Index_SurveyID").val()
         },
         success: async function(r){
           if(r.status == true){
             alert(r.msg)
+            $("#Index_surveying").val(r.data0);
+            $("#Index_surveyer").val(r.data1);
+            $("#Index_Purpose").val(r.data2);
+            $("#Index_SNS").val(r.data3);
+            $("#Index_goal").val(r.data4);
+            $("#Index_TotalQuestionsheet").val(r.data5);
+            $("#Index_TotalAnswersheet").val(r.data6);
           }else{
             alert(r.msg)
           }
         }
       })
     })
+    $("#infoindex").on("click",function(){
+      $.ajax({
+        type: "POST",
+        url : '/infoindex',
+        data : {
+          'surveyID' : $("#searchInfo_address").val()
+        },
+        success: async function(r){
+          if(r.status == true){
+            alert(r.msg)
+            $("#searchInfo_age").val(r.data0);
+            $("#searchInfo_sex").val(r.data1);
+            $("#searchInfo_height").val(r.data2);
+            $("#searchInfo_weight").val(r.data3);
+            $("#searchInfo_country").val(r.data4);
+          }else{
+            alert("error")
+          }
+        }
+      })
+    })
+    $("#searchQuestion").on("click",function(){
+      $.ajax({
+        type: "POST",
+        url : '/searchQuestion',
+        data : {
+          'surveyID' : $("#searchQuestion_surveyID").val(),
+          'searchQuestion_QustionSheetID' : $("#searchQuestion_QustionSheetID").val(),
+          'searchQuestion_questionID' : $("#searchQuestion_questionID").val(),
+
+        },
+        success: async function(r){
+          if(r.status == true){
+            alert(r.msg)
+            $("#searchQuestion_totalQuestion").val(r.data0);
+            $("#searchQuestion_question").val(r.data1);
+          }else{
+            alert("error")
+          }
+        }
+      })
+    })
+    $("#searchAnswer").on("click",function(){
+      $.ajax({
+        type: "POST",
+        url : '/getAnswers',
+        data : {
+          'surveyID' : $("#searchAnswer_surveyID").val(),
+          'searchAnswer_AnswerSheetID' : $("#searchAnswer_AnswerSheetID").val(),
+          'searchAnswer_AnswerID' : $("#searchAnswer_AnswerID").val(),
+
+        },
+        success: async function(r){
+          if(r.status == true){
+            alert(r.msg)
+            $("#searchAnswer_totalAnswer").val(r.data0);
+            $("#searchAnswer_Answer").val(r.data1);
+            $("#searchAnswer_Answerer").val(r.data2);
+          }else{
+            alert("error")
+          }
+        }
+      })
+    })
+    $("#gettotalsurvey").on("click",function(){
+      $.ajax({
+        type: "POST",
+        url : '/totalsurvey',
+        success: async function(r){
+          if(r.status == true){
+            alert("total survey number is"+r.data0)
+            $("#totalsurvey").val(r.data0);
+          }else{
+            alert("error")
+          }
+        }
+      })
+    })
+    $("#getcsv").on("click",function(){
+      $.ajax({
+        type: "POST",
+        url : '/getcsv',
+        success: async function(r){
+          if(r.status == true){
+            alert("total survey number is"+r.data0)
+            $("#totalsurvey").val(r.data0);
+          }else{
+            alert("error")
+          }
+        }
+      })
+    })
+
 
   })
 </script>
